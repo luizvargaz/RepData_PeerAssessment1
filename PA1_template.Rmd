@@ -36,7 +36,7 @@ nrow(data)
 
 1. Calculate the total number of steps taken per day
 ```{r echo = TRUE}
-dataDay <- aggregate(steps ~ date, data, sum)
+dataDay <- aggregate(steps ~ date, data, FUN = 'sum')
 print(dataDay)
 ```
 
@@ -44,7 +44,7 @@ print(dataDay)
 ```{r echo = TRUE}
 library(ggplot2)
 library(scales) 
-histSteps <- qplot(date, steps, data = dataDay, geom="line") + theme(aspect.ratio = 1)
+histSteps <- qplot(dataDay$steps, geom = 'histogram') + theme(aspect.ratio = 1)
 print(histSteps)
 ```
 
@@ -52,7 +52,8 @@ print(histSteps)
 ```{r echo = TRUE}
 library(data.table)
 dataDayT <- data.table(data)
-dataDayT[,list(mean = mean(steps), median = median(steps)), by = date]
+#dataDayT[,list(mean = mean(steps), median = median(steps)), by = date]
+dataDayT[,list(mean = mean(steps), median = median(steps))]
 ```
 
 
@@ -114,11 +115,12 @@ str(newData)
 ```{r echo = TRUE}
 library(ggplot2)
 library(scales)
-stepsByDay <- aggregate(steps ~ date, newData, sum)
-newHistSteps <- qplot(date, steps, data = stepsByDay, geom="line") + theme(aspect.ratio = 1)
+stepsByDay <- aggregate(steps ~ date, newData, FUN = 'sum')
+newHistSteps <- qplot(steps, data = stepsByDay, geom = 'histogram') + theme(aspect.ratio = 1)
 print(newHistSteps)
 newDataDayT <- data.table(newData)
-newDataDayT[,list(mean=mean(steps), median=median(steps)),by=date]
+#newDataDayT[,list(mean=mean(steps), median=median(steps)),by=date]
+newDataDayT[,list(mean=mean(steps), median=median(steps))]
 ```
 
 
@@ -127,7 +129,7 @@ newDataDayT[,list(mean=mean(steps), median=median(steps)),by=date]
 
 For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
-1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 ```{r echo = TRUE}
 dataDays <- newData
 dataDays$day <- weekdays(newData$date)
@@ -147,10 +149,10 @@ dataWeek <- rbind(dataDaysWeekend, dataDaysWeekday)
 ```
 
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
 ```{r}
-## See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
-library(lattice) 
-d <- aggregate(steps ~ interval + week, dataWeek, mean)
+d <- aggregate(steps ~ interval + week, dataWeek, FUN = 'mean')
+library(lattice)
 xyplot(steps ~ interval | factor(week),
        data = d,
        type = 'l', 
